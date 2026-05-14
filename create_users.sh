@@ -6,22 +6,22 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Kontrollera att användare skickats in
+# Kontrollera att minst en användare skickats in
 if [ $# -eq 0 ]; then
     echo "Användning: $0 användare1 användare2"
     exit 1
 fi
 
-# Loop genom alla användare
+# Loopar genom alla användare
 for user in "$@"
 do
-    # Skapa användare och hemkatalog
+    # Skapa användare med hemkatalog
     useradd -m "$user"
 
     # Hemkatalog
     HOME_DIR="/home/$user"
 
-    # Skapa mappar
+    # Skapa undermappar
     mkdir -p "$HOME_DIR/Documents"
     mkdir -p "$HOME_DIR/Downloads"
     mkdir -p "$HOME_DIR/Work"
@@ -36,14 +36,10 @@ do
 
     # Skapa welcome.txt
     echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
+    echo "Andra användare:" >> "$HOME_DIR/welcome.txt"
 
-    # Lista andra användare i systemet
-    for existing_user in $(cut -d: -f1 /etc/passwd)
-    do
-        if [ "$existing_user" != "$user" ]; then
-            echo "$existing_user" >> "$HOME_DIR/welcome.txt"
-        fi
-    done
+    # Lista alla användare i systemet
+    cut -d: -f1 /etc/passwd >> "$HOME_DIR/welcome.txt"
 
     # Rättigheter för welcome.txt
     chmod 600 "$HOME_DIR/welcome.txt"
