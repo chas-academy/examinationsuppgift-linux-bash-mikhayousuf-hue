@@ -12,9 +12,10 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-# Skapa användare
+# Loopa genom användare
 for user in "$@"
 do
+    # Skapa användare med hemkatalog
     useradd -m "$user"
 
     HOME_DIR="/home/$user"
@@ -24,20 +25,28 @@ do
     mkdir -p "$HOME_DIR/Downloads"
     mkdir -p "$HOME_DIR/Work"
 
-    # Rättigheter
+    # Sätt rättigheter
     chmod 700 "$HOME_DIR/Documents"
     chmod 700 "$HOME_DIR/Downloads"
     chmod 700 "$HOME_DIR/Work"
 
-    # Ägare
+    # Sätt ägare
     chown -R "$user:$user" "$HOME_DIR"
 
-    # Welcome-fil
-    echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
+    # Skapa welcome.txt
+    {
+        echo "Välkommen $user"
+        echo "Andra användare i systemet:"
 
-    # Alla andra användare
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "$HOME_DIR/welcome.txt"
+        for existing_user in $(cut -d: -f1 /etc/passwd)
+        do
+            if [ "$existing_user" != "$user" ]; then
+                echo "$existing_user"
+            fi
+        done
+    } > "$HOME_DIR/welcome.txt"
 
+    # Rättigheter för welcome.txt
     chmod 600 "$HOME_DIR/welcome.txt"
     chown "$user:$user" "$HOME_DIR/welcome.txt"
 
