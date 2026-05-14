@@ -18,7 +18,7 @@ do
     # Skapa användare och hemkatalog
     useradd -m "$user"
 
-    # Sökväg till hemkatalog
+    # Hemkatalog
     HOME_DIR="/home/$user"
 
     # Skapa mappar
@@ -26,21 +26,26 @@ do
     mkdir -p "$HOME_DIR/Downloads"
     mkdir -p "$HOME_DIR/Work"
 
-    # Ägare
-    chown -R "$user:$user" "$HOME_DIR"
-
-    # Rättigheter
+    # Sätt rättigheter
     chmod 700 "$HOME_DIR/Documents"
     chmod 700 "$HOME_DIR/Downloads"
     chmod 700 "$HOME_DIR/Work"
 
+    # Sätt ägare
+    chown -R "$user:$user" "$HOME_DIR"
+
     # Skapa welcome.txt
     echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
 
-    # Lista andra användare
-    cut -d: -f1 /etc/passwd >> "$HOME_DIR/welcome.txt"
+    # Lista andra användare i systemet
+    for existing_user in $(cut -d: -f1 /etc/passwd)
+    do
+        if [ "$existing_user" != "$user" ]; then
+            echo "$existing_user" >> "$HOME_DIR/welcome.txt"
+        fi
+    done
 
-    # Rättigheter för fil
+    # Rättigheter för welcome.txt
     chmod 600 "$HOME_DIR/welcome.txt"
     chown "$user:$user" "$HOME_DIR/welcome.txt"
 
