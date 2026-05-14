@@ -34,17 +34,15 @@ do
     chown -R "$user:$user" "$HOME_DIR"
 
     # Skapa welcome.txt
-    {
-        echo "Välkommen $user"
-        echo "Andra användare i systemet:"
+    echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
 
-        for existing_user in $(cut -d: -f1 /etc/passwd)
-        do
-            if [ "$existing_user" != "$user" ]; then
-                echo "$existing_user"
-            fi
-        done
-    } > "$HOME_DIR/welcome.txt"
+    # Lista andra användare i systemet
+    for existing_user in $(cut -d: -f1 /etc/passwd)
+    do
+        if [ "$existing_user" != "$user" ]; then
+            echo "$existing_user" >> "$HOME_DIR/welcome.txt"
+        fi
+    done
 
     # Rättigheter för welcome.txt
     chmod 600 "$HOME_DIR/welcome.txt"
