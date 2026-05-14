@@ -1,46 +1,47 @@
 #!/bin/bash
 
-# Script som skapar användare med hemkataloger
-# och lägger till mappar samt välkomstfil.
-
-# Kontrollera att scriptet körs som root
+# Kontrollera root
 if [ "$EUID" -ne 0 ]; then
-    echo "Fel: Scriptet måste köras som root."
+    echo "Du måste vara root för att köra scriptet."
     exit 1
 fi
 
-# Kontrollera att minst ett användarnamn skickas in
-if [ "$#" -eq 0 ]; then
-    echo "Användning: $0 användare1 användare2 användare3"
+# Kontrollera argument
+if [ $# -eq 0 ]; then
+    echo "Användning: $0 användare"
     exit 1
 fi
 
-# Loopar igenom alla användarnamn som skickats in
-for username in "$@"; do
+# Loopa igenom användare
+for user in "$@"
+do
+    # Skapa användare med hemkatalog
+    useradd -m "$user"
 
-    # Skapa användaren om den inte redan finns
-    if id "$username" &>/dev/null; then
-        echo "Användaren $username finns redan."
-    else
-        useradd -m "$username"
-        echo "Användaren $username har skapats."
-    fi
+    # Hemkatalog
+    HOME_DIR="/home/$user"
 
-    home_dir="/home/$username"
+    # Skapa undermappar
+    mkdir -p "$HOME_DIR/Documents"
+    mkdir -p "$HOME_DIR/Downloads"
+    mkdir -p "$HOME_DIR/Work"
 
-    # Skapa mappar i användarens hemkatalog
-    mkdir -p "$home_dir/Documents" "$home_dir/Downloads" "$home_dir/Work"
+    # Rättigheter
+    chmod 700 "$HOME_DIR/Documents"
+    chmod 700 "$HOME_DIR/Downloads"
+    chmod 700 "$HOME_DIR/Work"
 
-    # Skapa välkomstfil
-    echo "Välkommen $username" > "$home_dir/welcome.txt"
-    echo "Andra användare i systemet:" >> "$home_dir/welcome.txt"
-    cut -d: -f1 /etc/passwd >> "$home_dir/welcome.txt"
+    # Skapa welcome.txt
+    echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
+    echo "" >> "$HOME_DIR/welcome.txt"
+    echo "Andra användare i systemet:" >> "$HOME_DIR/welcome.txt"
 
-    # Sätt rätt ägare
-    chown -R "$username:$username" "$home_dir"
+    # Lista användare
+    cut -d: -f1 /etc/passwd >> "$HOME_DIR/welcome.txt"
 
-    # Endast ägaren får läsa och skriva
-    chmod 700 "$home_dir/Documents" "$home_dir/Downloads" "$home_dir/Work"
-    chmod 600 "$home_dir/welcome.txt"
+    # Ägare
+    chown -R "$user:$user" "$HOME_DIR"
+
+done
 
 done
