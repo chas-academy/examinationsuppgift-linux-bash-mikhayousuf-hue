@@ -27,12 +27,11 @@ do
     chmod 700 "$HOME_DIR/Downloads"
     chmod 700 "$HOME_DIR/Work"
 
-    echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
+   echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
+    
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "$HOME_DIR/welcome.txt"
 
-    cut -d: -f1 /etc/passwd >> "$HOME_DIR/welcome.txt"
-
-    chmod 600 "$HOME_DIR/welcome.txt"
-
-    chown -R "$user:$user" "$HOME_DIR"
+chmod 600 "$HOME_DIR/welcome.txt"
+chown -R "$user:$user" "$HOME_DIR"
 
 done
