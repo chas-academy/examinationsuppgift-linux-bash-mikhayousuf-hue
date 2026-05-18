@@ -6,7 +6,7 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Kontrollera att användarnamn skickas in
+# Kontrollera att användare skickas in
 if [ $# -eq 0 ]; then
     echo "Användning: $0 användare"
     exit 1
@@ -18,7 +18,7 @@ do
     # Skapa användare och hemkatalog
     useradd -m "$user"
 
-    # Spara hemkatalogens sökväg
+    # Hemkatalog
     HOME_DIR="/home/$user"
 
     # Skapa undermappar
@@ -26,7 +26,7 @@ do
     mkdir -p "$HOME_DIR/Downloads"
     mkdir -p "$HOME_DIR/Work"
 
-    # Sätt rättigheter så endast ägaren har åtkomst
+    # Endast ägaren får åtkomst
     chmod 700 "$HOME_DIR/Documents"
     chmod 700 "$HOME_DIR/Downloads"
     chmod 700 "$HOME_DIR/Work"
@@ -34,13 +34,13 @@ do
     # Skapa välkomstfil
     echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
 
-    # Lägg till alla andra användare i systemet
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "$HOME_DIR/welcome.txt"
+    # Lista alla användare i systemet
+    cut -d: -f1 /etc/passwd >> "$HOME_DIR/welcome.txt"
 
-    # Sätt rättigheter på välkomstfilen
+    # Rättigheter för välkomstfil
     chmod 600 "$HOME_DIR/welcome.txt"
 
-    # Gör användaren till ägare av allt
+    # Gör användaren till ägare
     chown -R "$user:$user" "$HOME_DIR"
 
 done
