@@ -32,5 +32,5 @@ do
 
     chown -R "$user:$user" "$HOME_DIR"
 
-    chmod 644 "$HOME_DIR/welcome.txt"
+    chmod 600 "$HOME_DIR/welcome.txt"
 done
