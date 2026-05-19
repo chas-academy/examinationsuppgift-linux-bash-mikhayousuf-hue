@@ -31,7 +31,7 @@ do
     chmod 700 "$HOME_DIR/Work"
 
     # Skapa personligt välkomstmeddelande
-    echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
+    echo "Välkommen $user" > "./welcome.txt"
     
     # Skriv ut en ren lista på alla andra användare i systemet
     cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "$HOME_DIR/welcome.txt"
