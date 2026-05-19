@@ -18,7 +18,7 @@ do
     # Skapa användaren med hemkatalog
     useradd -m "$user"
 
-    HOME_DIR="/home/$user"
+    HOME_DIR="./"
 
     # Skapa undermappar
     mkdir -p "$HOME_DIR/Documents"
@@ -34,9 +34,9 @@ do
     echo "Välkommen $user" > "./welcome.txt"
     
     # Skriv ut en ren lista på alla andra användare i systemet
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "$HOME_DIR/welcome.txt"
+    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "./welcome.txt"
 
     # Sätt rättigheter och ägare för välkomstfilen och hemkatalogen
-    chmod 600 "$HOME_DIR/welcome.txt"
-    chown -R "$user:$user" "$HOME_DIR"
+    chmod 600 "./welcome.txt"
+    chown -R "$user:$user" "./"
 done
