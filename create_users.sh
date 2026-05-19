@@ -6,38 +6,41 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Kontrollera att minst ett användarnamn skickas in
+# Kontrollera att användare skickas in
 if [ $# -eq 0 ]; then
     echo "Användning: $0 användare"
     exit 1
 fi
 
+# Hämta alla användare som redan finns
+OLD_USERS=$(cut -d: -f1 /etc/passwd)
+
 # Loopa igenom alla användare
 for user in "$@"
 do
-    # Skapa användare med hemkatalog
-    useradd -m "$user"
+    # Skapa användare med hemkatalog och bash-shell
+    useradd -m -s /bin/bash "$user"
 
     # Sätt hemkatalog
-    HOME_DIR="/home/$user"
+    HOME_DIR=$(eval echo "~$user")
 
-    # Skapa mappar i användarens hemkatalog
+    # Skapa undermappar
     mkdir -p "$HOME_DIR/Documents"
     mkdir -p "$HOME_DIR/Downloads"
     mkdir -p "$HOME_DIR/Work"
 
-    # Endast ägaren får läsa skriva och gå in
+    # Sätt rättigheter
     chmod 700 "$HOME_DIR/Documents"
     chmod 700 "$HOME_DIR/Downloads"
     chmod 700 "$HOME_DIR/Work"
 
-    # Skapa welcome.txt i användarens hemkatalog
+    # Skapa welcome.txt
     echo "Välkommen $user" > "$HOME_DIR/welcome.txt"
 
-    # Lägg till alla andra användare
-    cut -d: -f1 /etc/passwd | grep -v "^$user$" >> "$HOME_DIR/welcome.txt"
+    # Lägg till andra användare
+    echo "$OLD_USERS" >> "$HOME_DIR/welcome.txt"
 
-    # Sätt rätt ägare och rättigheter
+    # Sätt ägare och rättigheter
     chown -R "$user:$user" "$HOME_DIR"
     chmod 600 "$HOME_DIR/welcome.txt"
 done
